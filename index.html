@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vocabulary Viewer</title>
+</head>
+<body>
+    <header><style type="text/css">body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+h1 {
+    margin: 0;
+}
+
+
+
+#settingsPanel {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+
+}
+
+#chapterSelector {
+    margin-top: 20px;
+}
+
+table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.hidden {
+    display: none;
+}
+</style>
+        <h1>Vocabulary List for Lark by Anthony McGowan</h1>
+    
+    </header>
+
+    <div id="settingsPanel">
+        <label><input type="checkbox" id="showUkrainian" checked> Ukrainian</label>
+        <label><input type="checkbox" id="showMalay" checked> Malay</label>
+        <label><input type="checkbox" id="showTurkish" checked> Turkish</label>
+        <label><input type="checkbox" id="showPashto" checked> Pashto</label>
+        <label><input type="checkbox" id="showAlbanian" checked> Albanian</label>
+    </div>
+
+    <div id="chapterSelector">
+        <label for="chapterSelect">Choose a chapter:</label>
+        <select id="chapterSelect"></select>
+    </div>
+
+    <table id="vocabTable">
+        <thead>
+            <tr>
+                <th>English</th>
+                <th>Explanation</th>
+                <th class="ukrainian">Ukrainian</th>
+                <th class="malay">Malay</th>
+                <th class="turkish">Turkish</th>
+                <th class="pashto">Pashto</th>
+                <th class="albanian">Albanian</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script src="vocab.js"></script>
+    <script>
+        const vocabTableBody = document.querySelector('#vocabTable tbody');
+        const chapterSelect = document.querySelector('#chapterSelect');
+        const settingsBtn = document.querySelector('#settingsBtn');
+        const settingsPanel = document.querySelector('#settingsPanel');
+
+        // Checkbox settings
+        const languageSettings = {
+            showUkrainian: true,
+            showMalay: true,
+            showTurkish: true,
+            showPashto: true,
+            showAlbanian: true
+        };
+
+        // Load chapters into select
+        function loadChapters() {
+            vocabData.forEach((chapter, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = `Chapter ${index}`;
+                chapterSelect.appendChild(option);
+            });
+        }
+        function updateTableHeader() {
+            const headerRow = document.querySelector('#vocabTable thead tr');
+            headerRow.innerHTML = '<th>Explanation</th><th>English</th>';
+            
+            if (languageSettings.showUkrainian) headerRow.innerHTML += '<th>Ukrainian</th>';
+            if (languageSettings.showMalay) headerRow.innerHTML += '<th>Malay</th>';
+            if (languageSettings.showTurkish) headerRow.innerHTML += '<th>Turkish</th>';
+            if (languageSettings.showPashto) headerRow.innerHTML += '<th>Pashto</th>';
+            if (languageSettings.showAlbanian) headerRow.innerHTML += '<th>Albanian</th>';
+        }
+        // Render vocab table
+        function renderVocabTable(chapterIndex) {
+            const chapter = vocabData[chapterIndex];
+            vocabTableBody.innerHTML = '';
+            
+            chapter.words.forEach(wordData => {
+                const row = document.createElement('tr');
+                const explanationCell = document.createElement('td');
+                explanationCell.textContent = wordData.explanation;
+                row.appendChild(explanationCell);
+
+                const wordCell = document.createElement('td');
+                wordCell.textContent = wordData.word;
+                row.appendChild(wordCell);
+                
+
+                if (languageSettings.showUkrainian) {
+                    const ukrCell = document.createElement('td');
+                    ukrCell.textContent = wordData.ukrainian;
+                    row.appendChild(ukrCell);
+                }
+
+                if (languageSettings.showMalay) {
+                    const malayCell = document.createElement('td');
+                    malayCell.textContent = wordData.malay;
+                    row.appendChild(malayCell);
+                }
+
+                if (languageSettings.showTurkish) {
+                    const turkishCell = document.createElement('td');
+                    turkishCell.textContent = wordData.turkish;
+                    row.appendChild(turkishCell);
+                }
+
+                if (languageSettings.showPashto) {
+                    const pashtoCell = document.createElement('td');
+                    pashtoCell.textContent = wordData.pashto;
+                    row.appendChild(pashtoCell);
+                }
+
+                if (languageSettings.showAlbanian) {
+                    const albanianCell = document.createElement('td');
+                    albanianCell.textContent = wordData.albanian;
+                    row.appendChild(albanianCell);
+                }
+                
+                vocabTableBody.appendChild(row);
+            });
+        }
+
+      
+
+        // Update language visibility settings
+        document.querySelectorAll('#settingsPanel input').forEach(checkbox => {
+            checkbox.addEventListener('change', (event) => {
+                const { id, checked } = event.target;
+                languageSettings[id] = checked;
+                updateTableHeader();
+                renderVocabTable(chapterSelect.value);
+            });
+        });
+
+        // Handle chapter selection
+        chapterSelect.addEventListener('change', (event) => {
+            renderVocabTable(event.target.value);
+        });
+
+        // Initial load
+
+        loadChapters();
+        updateTableHeader();
+        renderVocabTable(0); // Load first chapter by default
+    </script>
+</body>
+</html>
